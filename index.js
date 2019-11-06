@@ -171,48 +171,50 @@ function isMultiPart(ctx, opts) {
  * @api private
  */
 function formy(ctx, opts) {
-  return new Promise(function (resolve, reject) {
-    var fields = {};
-    var files = {};
-    var form;
-    if(opts instanceof Object){
-     form = new forms.IncomingForm(opts);
-      
-      form.on('end', function () {
+   return new Promise(function(resolve, reject) {
+    var fields = {}
+    var files = {}
+    var form
+    if (opts instanceof Object) {
+      form = new forms.IncomingForm(opts)
+      if (opts.onFileBegin) {
+        form.on('fileBegin', opts.onFileBegin)
+      }
+    } else {
+      form = opts
+    }
+    form
+      .on('end', function() {
         return resolve({
           fields: fields,
-          files: files
-        });
-      }).on('error', function (err) {
-        return reject(err);
-      }).on('field', function (field, value) {
+          files: files,
+        })
+      })
+      .on('error', function(err) {
+        return reject(err)
+      })
+      .on('field', function(field, value) {
         if (fields[field]) {
           if (Array.isArray(fields[field])) {
-            fields[field].push(value);
+            fields[field].push(value)
           } else {
-            fields[field] = [fields[field], value];
+            fields[field] = [fields[field], value]
           }
         } else {
-          fields[field] = value;
+          fields[field] = value
         }
-      }).on('file', function (field, file) {
+      })
+      .on('file', function(field, file) {
         if (files[field]) {
           if (Array.isArray(files[field])) {
-            files[field].push(file);
+            files[field].push(file)
           } else {
-            files[field] = [files[field], file];
+            files[field] = [files[field], file]
           }
         } else {
-          files[field] = file;
+          files[field] = file
         }
-      });
-      if (opts.onFileBegin) {
-        form.on('fileBegin', opts.onFileBegin);
-      }
-    }else{
-      form = opts;
-    }
-    
-    form.parse(ctx.req);
-  });
+      })
+    form.parse(ctx.req)
+  })
 }
