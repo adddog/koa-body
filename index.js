@@ -175,7 +175,7 @@ function formy(ctx, opts) {
     var fields = {};
     var files = {};
     var form;
-    if(typeof opts === 'object'){
+    if(opts instanceof Object){
      form = new forms.IncomingForm(opts);
       
       form.on('end', function () {
